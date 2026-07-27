@@ -10,7 +10,7 @@ Root cause: missing whitespace tolerance in the regex patterns — not a problem
 Expected: `detected_sections` includes `Education` and `Skills` for the reproduction input.
 Actual: `detected_sections` returns `[]`.
 
-
+### Map
 Files I expect to touch:
 - `ingestion/parsers/resume_parser.py` — the `_detect_sections()` method, where the regex patterns are built and matched. This is the only method that needs to change.
 - `tests/unit/test_resume_parser.py` — no new tests needed; three existing tests (`test_parse_single_column_resume_text`, `test_parse_resume_no_work_experience`, `test_detect_sections`) already define the expected passing behavior and currently fail against the original code.
