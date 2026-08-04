@@ -125,7 +125,7 @@ class ResumeParser(BaseParser):
         return text.strip()
 
     def _detect_sections(self, text: str) -> list[str]:
-        """Detect common resume sections from text."""
+        """Detect common resume sections from text, tolerating leading indentation."""
         detected = []
         text_lower = text.lower()
 

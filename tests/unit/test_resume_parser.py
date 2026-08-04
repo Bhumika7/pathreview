@@ -127,7 +127,7 @@ class TestResumeParser:
         """Test section detection in resume text."""
         text = """
         Experience:
-        Senior Developer at TechCorp
+        Developer at Your1000resume
 
         Education:
         BS Computer Science
@@ -140,6 +140,64 @@ class TestResumeParser:
         assert len(sections) > 0
         sections_lower = [s.lower() for s in sections]
         assert any("experience" in s for s in sections_lower)
+        assert any("education" in s for s in sections_lower)
+        assert any("skills" in s for s in sections_lower)
+
+    def test_detect_sections_with_leading_whitespace(self, parser):
+        """Test that indented section headers (e.g. from PDF extraction) are detected."""
+        text = """
+        Education:
+        - B.S. Computer Science
+
+        Skills: Python
+        """
+        sections = parser._detect_sections(text)
+
+        sections_lower = [s.lower() for s in sections]
+        assert any("education" in s for s in sections_lower)
+        assert any("skills" in s for s in sections_lower)
+
+    def test_detect_sections_with_leading_whitespace_no_punctuation(self, parser):
+        """Test that an indented header with no trailing punctuation is still detected."""
+        text = """
+        Summary
+        Experienced backend engineer.
+
+        Skills: Python
+        """
+        sections = parser._detect_sections(text)
+
+        sections_lower = [s.lower() for s in sections]
+        assert any("summary" in s for s in sections_lower)
+
+    def test_detect_sections_with_tab_indentation(self, parser):
+        """Test that tab-indented section headers are detected."""
+        text = "\tEducation:\n\tBS Computer Science\n\n\tSkills: Python"
+        sections = parser._detect_sections(text)
+
+        sections_lower = [s.lower() for s in sections]
+        assert any("education" in s for s in sections_lower)
+        assert any("skills" in s for s in sections_lower)
+
+    def test_detect_sections_ignores_keyword_mid_sentence(self, parser):
+        """Test that a section keyword used mid-sentence isn't flagged as a header."""
+        text = """
+        I have five years of experience building web applications.
+
+        Skills: Python
+        """
+        sections = parser._detect_sections(text)
+
+        sections_lower = [s.lower() for s in sections]
+        assert not any(s.lower() == "experience" for s in sections_lower)
+        assert any("skills" in s for s in sections_lower)
+
+    def test_detect_sections_without_leading_whitespace_still_works(self, parser):
+        """Test that non-indented section headers (the original working case) are unaffected."""
+        text = "Education:\nBS Computer Science\n\nSkills: Python"
+        sections = parser._detect_sections(text)
+
+        sections_lower = [s.lower() for s in sections]
         assert any("education" in s for s in sections_lower)
         assert any("skills" in s for s in sections_lower)
 
