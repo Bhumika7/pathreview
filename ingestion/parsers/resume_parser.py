@@ -125,14 +125,13 @@ class ResumeParser(BaseParser):
         return text.strip()
 
     def _detect_sections(self, text: str) -> list[str]:
-        """Detect common resume sections from text."""
+        """Detect common resume sections from text, tolerating leading indentation."""
         detected = []
         text_lower = text.lower()
 
         for section in SECTION_HEADERS:
-            '''
-             Allow optional leading spaces/tabs before the header, since, text extracted from PDFs commonly preserves indentation.
-            '''
+            # PDF text extraction often keeps leading indentation, so allow
+            # optional spaces before the header
             patterns = [
                 rf"^[ \t]*{re.escape(section)}\s*$",
                 rf"^[ \t]*{re.escape(section)}\s*[:|-]",
