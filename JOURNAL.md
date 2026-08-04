@@ -23,3 +23,13 @@ print(res.metadata['detected_sections'])
 
 Against the original code, this returned `[]` instead of the expected `['Education', 'Skills']`, confirming the bug. I also ran the three related tests (`test_parse_single_column_resume_text`, `test_parse_resume_no_work_experience`, `test_detect_sections`) and confirmed they failed against the unmodified `_detect_sections()` method, matching what the issue describes.
 
+## Week 9 — Implementation & PR submission
+
+**PR link:** [#219 — Fixed section detection for text with leading whitespace](https://github.com/ascherj/pathreview/pull/219)
+
+**Progress:** Implemented the fix in `_detect_sections()` — added `[ \t]*` to the anchor patterns so leading spaces/tabs before a section header no longer block detection, and dropped the two redundant `\n`-anchored patterns. Added 5 new unit tests covering indented headers with and without trailing punctuation, tab indentation, a mid-sentence keyword false-positive check, and a regression guard for the original non-indented case, on top of the 3 tests already defined by the issue. All 8 pass.
+
+**Self-review:** Ran `make test-unit` — all section-detection tests pass; the suite has 50 pre-existing unrelated failures across other modules (confirmed unrelated by checking they touch different files/methods than this change, e.g. `_strip_markdown()` not `_detect_sections()`). `mypy` is clean on `resume_parser.py` specifically. `ruff` flags 3 pre-existing style issues in `resume_parser.py` (import spacing, missing `raise ... from e`, no trailing newline) that predate this change — left untouched to keep the diff scoped to the reported bug rather than bundling in unrelated cleanup. Both are disclosed in the PR's "Notes for Reviewers" section so they aren't mistaken for regressions.
+
+**Blockers or open questions:** None. PR is open against `ascherj/pathreview:main` and awaiting review.
+
